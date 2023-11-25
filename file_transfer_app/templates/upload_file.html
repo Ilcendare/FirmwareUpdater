@@ -1,0 +1,16 @@
+<!-- file_transfer_app/templates/upload_file.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Upload</title>
+</head>
+<body>
+    <h2>File Upload</h2>
+    <form method="post" enctype="multipart/form-data" action="{% url 'upload_file' %}">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".txt,.pdf,.doc,.docx">
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>
