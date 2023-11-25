@@ -1,5 +1,5 @@
 asgiref==3.7.2
-cffi==1.16.0
+cffi==1.15.1
 cryptography==41.0.5
 Django==4.2.7
 paho-mqtt==1.6.1
