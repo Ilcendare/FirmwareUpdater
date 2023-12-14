@@ -1,2 +1,3 @@
 # Firmware Updater website
-This is a project website to update the firmware of a car through air (FOTA).
+This is a back-end server made for the application of FOTA (Firmware Over The Air).
+This application is made for the NTI (National Telecommunication Institute) graduation project.
