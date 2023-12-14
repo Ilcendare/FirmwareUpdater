@@ -1,4 +1,0 @@
-Hi from local desktop
-This is a text file
-It is used to print on the MQTT server
-It is a test file

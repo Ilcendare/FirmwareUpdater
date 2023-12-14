@@ -16,7 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from file_transfer_app.views import upload_file
+from django.conf import settings
+from django.conf.urls.static import static
 from file_transfer_app.views import home
 
 urlpatterns = [
@@ -24,3 +25,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('FirmwareUpdater/', include('file_transfer_app.urls')),
 ]
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

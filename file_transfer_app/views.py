@@ -1,75 +1,102 @@
-from django.shortcuts import render
-
 # Create your views here.
 # file_transfer_app/views.py
 
+
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 import paho.mqtt.publish as publish
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
-import json
-
+import paho.mqtt.subscribe as subscribe
 from .models import FileTransfer
 
+CipheredPassword = "QDwcg{dw`wiSbbX{d⌂isdwGbvsfwQQX\"FRQ"
+
 @csrf_exempt
-# @require_POST
-# def upload_file(request):
-#     file = request.FILES['file']
-#     file_obj = FileTransfer.objects.create(file=file)
-    
-#     # Publish file information to MQTT topic
-#     mqtt_message = json.dumps({
-#         'file_path': file_obj.file.url,
-#         'uploaded_at': str(file_obj.uploaded_at),
-#     })
-#     publish.single('thetr619@gmail.com/firmware', mqtt_message, hostname='maqiatto.com')
-
-#     return HttpResponse('File uploaded successfully.')
-
 def upload_file(request):
     if request.method == 'GET':
         # Handle GET requests (if needed)
         return render(request, 'upload_file.html')
+    
     elif request.method == 'POST':
-        if 'file' not in request.FILES:
+        # if no file has uploaded and an upload request ran
+        if 'file' not in request.FILES: 
             return HttpResponse('No file selected.', status=400)
-
+        
         file = request.FILES['file']
         file_obj = FileTransfer.objects.create(file=file)
 
         # Get the file path
         file_path = file_obj.file.path
 
-        # Read and publish each line as a separate message
-        with open(file_path, 'r') as file_content:
-            for line in file_content:
-                # Remove leading and trailing whitespaces from the line
-                cleaned_line = line.strip()
-                encrypted_line = encrypt_aes(cleaned_line.encode())
-                ascii_line = encrypted_line.decode('ascii', errors='ignore')
-                mqtt_message = ascii_line
-                publish.single('thetr619@gmail.com/firmware', mqtt_message, hostname='maqiatto.com', port=1883, auth={'username': 'thetr619@gmail.com', 'password': 'Room@Temp555'})
+        # Send the ecrypted password (Hash)
+        publish.single(
+                    client_id='server',
+                    topic='ntigraduationserver@gmail.com/FOTA',
+                    keepalive=120,
+                    payload=CipheredPassword, 
+                    qos=2, 
+                    retain=False, 
+                    hostname='maqiatto.com',
+                    port=1883, 
+                    auth={'username': 'ntigraduationserver@gmail.com', 'password': 'Server'})
 
-        return HttpResponse('File content uploaded successfully.')
+        # For debug purposes
+        print("Password Sent")
+
+        # Wait until receives the respond 
+        Response = subscribe.simple(
+                    client_id='server',
+                    topics='ntigraduationserver@gmail.com/FOTA',
+                    keepalive=120, 
+                    qos=2, 
+                    retained=False, 
+                    hostname='maqiatto.com',
+                    port=1883, 
+                    auth={'username': 'ntigraduationserver@gmail.com', 'password': 'Server'})
+        
+        print("Response get: " + str(Response.payload.decode('ascii',errors='ignore')))
+
+        # If the response is "P" then skip the next line, else retrun an HTTP response and exit the function.
+        if Response != "P":
+            return HttpResponse("Error: Security Access Denied.",status=406)
+        
+        # Defining a variable to count the number of records published
+        i = 0
+        
+        # Read and publish each line as a separate message
+        with open(file_path, 'r') as file_content:    # open file as read
+            for line in file_content:                 # loop for each line
+                # Increment the counter
+                i += 1
+
+                # Remove leading and trailing whitespaces from the line
+                cleaned_line = line.strip()   
+                
+                # Assign the record to the payload variable
+                mqtt_message = cleaned_line
+                
+                # Publish the record (payload) to the MQTT broker.
+                publish.single(
+                    client_id='server',
+                    topic='ntigraduationserver@gmail.com/FOTA',
+                    keepalive=120,
+                    payload=mqtt_message, 
+                    qos=2, 
+                    retain=False, 
+                    hostname='maqiatto.com',
+                    port=1883, 
+                    auth={'username': 'ntigraduationserver@gmail.com', 'password': 'Server'})
+                
+                # Print the published record line number
+                print("+++ Record Sent +++")
+                print("line: " + str(i))
+
+        # Render the successful page
+        return render(request, 'upload_file success.html')
         
     else:
         return HttpResponse('Method not allowed.', status=405)
 
 
 def home(request):
-    return HttpResponse("Welcome to the File Transfer App!")
-
-
-def encrypt_aes(data):
-    key = b'112ABCDEFGHI12312313310101010101'  # 32 bytes for AES-256
-    nonce = b'122Y122X122Z122E'  # 16 bytes for AES-GCM
-
-    cipher = Cipher(algorithms.AES(key), modes.GCM(nonce), backend=default_backend())
-    encryptor = cipher.encryptor()
-    ciphertext = encryptor.update(data) + encryptor.finalize()
-
-    # Append the authentication tag to the ciphertext
-    encrypted_data = ciphertext + encryptor.tag
-    return encrypted_data
+    return render(request, 'LOGIN FORM.HTML')

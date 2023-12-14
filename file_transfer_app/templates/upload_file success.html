@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <title>FOTA Updater Application Client</title>
+</head>
+<body style="background-color: rgb(19 15 74 / 100%);">
+    <nav class="navbar sticky-top navbar-light text-black">
+        <div  class="container-fluid text-black">
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'file_transfer_app/images/NTI.png' %}" width="30" height="30" alt="">
+                <span style=" color: #FFF;" class="navbar-brand" href="#">FOTA Updater (The Firmware is Uploaded Successfully)</span>
+            </a>
+            <!-- <a style=" color: #000;" class="navbar-brand" href="#">FOTA Server</a> -->
+        </div>
+    </nav>
+
+    <section class="bg-position-center-top"
+        style="background-image: url('{% static 'file_transfer_app/images/2.gif' %}'); max-width:100% ; height:595px ;">
+        <div class="mb-lg-3 pb-4 pt-5">
+            <div style="margin: 100px;" class="container">
+                <div class="row mb-4 mb-sm-5">
+                    <div class="col-lg-7 col-md-9 text-center mx-auto">
+                        <!-- <h1 style="color: rgb(0 0 0 / 51%);" class="line-height-base">The best software in the market is perfect panel</h1>
+                        <h2 style="color:  rgb(0 0 0 / 51%);" class="h4 font-weight-light">The official site to download the clean code and
+                            original themes
+                            for perfect panel software</h2> -->
+                    </div>
+                </div>
+                <form method="post" enctype="multipart/form-data" action="{% url 'upload_file' %}">
+                    {% csrf_token %}
+                    <div class="row mb-4 mb-sm-5" style="margin-top: 100px;">
+                        <div class="col-lg-6 col-md-8 mx-auto text-center">
+                            <div class="input-group" style="margin-bottom: 10px;">
+                                <!-- <input
+                                class="form-control form-control-lg prepended-form-control rounded-right-0 ui-autocomplete-input text-black line-height-base"
+                                style="height: 20px;" type="file" id="upload_file" name="upload_file"
+                                placeholder="Upload your file..." autocomplete="off"  required> -->
+                                    <label for="formFileLg" class="form-label"></label>
+                                    <input class="form-control form-control-lg" id="upload_file" name="file" type="file" accept=".txt,.pdf,.doc,.docx,.hex,.bin">
+                              </div>
+                              <div class="input-group-append">
+                                <button id="upload-file-btn" class="btn btn-primary btn-lg font-size-base" type="submit">Upload Firmware
+                                    </button>
+                              </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    {% comment %} <script>
+        $(function () {
+                $('#upload-file-btn').click(function () {
+                    
+                    var form_data = new FormData();
+                    form_data.append('file', $('#upload_file').prop('files')[0]);
+                    if(document.getElementById("upload_file").files.length > 0)
+                    {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/FirmwareUpdater/',
+                            data: form_data,
+                            contentType: false,
+                            cache: false,
+                            processData: false,
+                            success: function (data) {
+                                console.log('Success!');
+                                alert("Succeeded");
+                            },
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Please fill out the field.",
+                        });
+                    }
+                    
+                });
+            });
+    </script> {% endcomment %}
+</body>
+</html>

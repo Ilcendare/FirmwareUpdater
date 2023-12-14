@@ -16,10 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from file_transfer_app.views import upload_file
-from file_transfer_app.views import home
 
 urlpatterns = [
     path('', upload_file, name='upload_file'),
-    # path('', home, name='home'),  # Add this line for the root URL
 ]
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

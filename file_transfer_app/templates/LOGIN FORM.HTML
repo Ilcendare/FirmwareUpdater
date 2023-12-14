@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <title>FOTA Updater Login</title>
+    </head>
+    <body style="background-color: rgb(13 110 253 / 67%);">
+      <nav class="navbar sticky-top navbar-light text-black">
+          <div  class="container-fluid text-black">
+              <a class="navbar-brand" href="#">
+                  <src="{% static 'file_transfer_app/images/NTI.png' %}" width="30" height="30" alt="">
+                  <span style=" color: #000;" class="navbar-brand" href="#">FOTA Server</span>
+                </a>
+              <!-- <a style=" color: #000;" class="navbar-brand" href="#">FOTA Server</a> -->
+          </div>
+      </nav>
+    <body>
+        <section class="vh-100" style="background-image: url('{% static 'file_transfer_app/images/PIC1.png' %}'); max-width:100% ; height:595px ;" >
+          
+            <div class="container py-5 h-100">
+              <div class="row d-flex align-items-center justify-content-center h-100">
+                
+                <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
+                  <form>
+                    <!-- Email input -->
+                    <div class="form-outline mb-4">
+                      <label style="color: aliceblue;" class="form-label" for="formUSerName">User Name</label>
+                      <input type="text" id="formUSerName" class="form-control form-control-lg" onchange="userNameChange()"/>
+                      <p class="text-danger" id="validUserName"></p>
+                    </div>
+          
+                    <!-- Password input -->
+                    <div class="form-outline mb-4">
+                      <label style="color: aliceblue;" class="form-label" for="formPassword">Password</label>
+                      <input type="password" id="formPassword" class="form-control form-control-lg" onchange="passwordChange()"/>
+                      <p class="text-danger" id="validPassword"></p>
+                    </div>
+          
+                  
+                    <a type="button" onclick="SignIn(event)" class="btn btn-primary btn-lg btn-block">Sign In </a>
+                   
+                  
+          
+                  </form>
+                </div>
+              </div>
+            </div>
+          </section>
+
+
+
+          <script>
+            function userNameChange(){
+              var userName = document.getElementById('formUSerName').value;
+              if(userName.length < 1)
+              {
+                document.getElementById('validUserName').innerHTML = "fill out the user name field"
+              }else{
+                document.getElementById('validUserName').innerHTML = ""
+              }
+            }
+            function passwordChange(){
+              var password = document.getElementById('formPassword').value;
+              if(password.length < 1)
+              {
+                document.getElementById('validPassword').innerHTML = "fill out the password field"
+              }else{
+                document.getElementById('validPassword').innerHTML =""
+              }
+            }
+            function SignIn(event){
+              event.preventDefault();
+              var userName = document.getElementById('formUSerName').value;
+              var password = document.getElementById('formPassword').value;
+
+              var userNameStatic = 'FOTA_SERVER';
+              var passwordStatic = '12345';
+
+              if (userName.length > 0 && password.length > 0) {
+                if (userName == userNameStatic && password == passwordStatic) {
+                  //document.location.href="upload_file.html";
+                  console.log('JavaScript code is executing.');
+                  fetch('/FirmwareUpdater', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Add any other headers if needed
+                    },
+                  }).then(response => {
+                    // Check if the response is successful (status code 200)
+                    if (response.ok) {
+                        // Navigate to the desired page here
+                        document.location.href = response.url;
+                    } else {
+                        // Handle errors or show an alert
+                        console.error('Failed to fetch:', response.statusText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Failed to fetch: ' + response.statusText,
+                        });
+                    }
+                })
+
+                } else {
+                  // alert("Invalid username or password. Please try again.");
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Invalid username or password. Please try again.",
+                  });
+                }
+              } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Please fill the fields..",
+                  });
+                if(userName.length < 1 || password.length < 1){
+                  if(userName.length < 1){
+                    document.getElementById('validUserName').innerHTML = "fill out the field"
+                  }
+                  if(password.length < 1){
+                    document.getElementById('validPassword').innerHTML = "fill out the field"
+                  }
+                }
+              }
+            } 
+            
+        
+          </script>
+    </body>
+</html>
